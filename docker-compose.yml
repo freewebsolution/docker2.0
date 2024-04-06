@@ -1,0 +1,40 @@
+version: '4.28.0'
+services:
+    web:
+        image: nginx:latest
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+            - ./public:/public
+    php:
+        build:
+            context: .
+            dockerfile: PHP.Dockerfile
+        volumes:
+            - ./public:/public
+    mysql:
+        image: mariadb:latest
+        environment:
+            MYSQL_ROOT_PASSWORD: ['demo']
+            MYSQL_USER: ['root']
+            MYSQL_PASSWORD: ['demo']
+            MYSQL_DATABASE: ['db_name']
+        volumes:
+            - mysqldata:/var/lib/mysql
+        ports:
+            - 3306:3306
+    phpmyadmin:
+        image: phpmyadmin
+        restart: always
+        ports:
+            - "8080:80"
+        depends_on:
+            - mysql
+        environment:
+            PMA_HOST: ['mysql'] 
+            MYSQL_USER: ['root']
+            MYSQL_PASSWORD: ['demo']
+            MYSQL_DATABASE: ['db_name']
+volumes:
+    mysqldata: {}
